@@ -1,28 +1,28 @@
-\# 🛒 Plataforma E-commerce Escalable  
+# 🛒 Plataforma E-commerce Escalable  
 
-\*\*Arquitectura MVVM · Alta Performance · SEO-First\*\*
-
-
-
-\## 📌 Descripción General
+**Arquitectura MVVM · Alta Performance · SEO-First**
 
 
 
-Este proyecto corresponde a una \*\*plataforma de e-commerce moderna y escalable\*\*, diseñada como \*\*plantilla base\*\* para sitios de \*\*volumen medio a alto de tráfico y ventas\*\*.  
-
-Está construida bajo el \*\*patrón arquitectónico MVVM\*\*, con un enfoque en:
+## 📌 Descripción General
 
 
 
-\- rendimiento
+Este proyecto corresponde a una **plataforma de e-commerce moderna y escalable**, diseñada como **plantilla base** para sitios de **volumen medio a alto de tráfico y ventas**.  
 
-\- escalabilidad
+Está construida bajo el **patrón arquitectónico MVVM**, con un enfoque en:
 
-\- mantenibilidad
 
-\- SEO
 
-\- reutilización en distintos proyectos o clientes
+- rendimiento
+
+- escalabilidad
+
+- mantenibilidad
+
+- SEO
+
+- reutilización en distintos proyectos o clientes
 
 
 
@@ -34,61 +34,33 @@ El sistema separa claramente las responsabilidades entre frontend, backend, dato
 
 
 
-\## 🧠 Metodología de Desarrollo
+## 🧠 Metodología de Desarrollo
 
 
 
-\### 🔹 Enfoque
+### 🔹 Enfoque
 
-\- \*\*Arquitectura modular\*\*
+- **Arquitectura modular**
 
-\- \*\*Separation of Concerns\*\*
+- **Separation of Concerns**
 
-\- \*\*Design System reutilizable\*\*
+- **Design System reutilizable**
 
-\- \*\*API-first\*\*
+- **API-first**
 
-\- \*\*Escalabilidad horizontal desde el diseño\*\*
-
-
-
-\### 🔹 Patrones
-
-\- \*\*MVVM (Model–View–ViewModel)\*\*
-
-\- Repository Pattern (backend)
-
-\- Event-driven (recomendaciones, métricas)
-
-\- Cache-aside (Redis)
+- **Escalabilidad horizontal desde el diseño**
 
 
 
----
+### 🔹 Patrones
 
+- **MVVM (Model–View–ViewModel)**
 
+- Repository Pattern (backend)
 
-\## 🧱 Arquitectura General
+- Event-driven (recomendaciones, métricas)
 
-
-
-\[ Cliente (Browser) ]
-
-↓
-
-\[ Next.js (Views) ]
-
-↓
-
-\[ ViewModels / Services ]
-
-↓
-
-\[ API Backend (FastAPI / NestJS) ]
-
-↓
-
-\[ MySQL ] \[ MongoDB ] \[ Redis ]
+- Cache-aside (Redis)
 
 
 
@@ -96,13 +68,41 @@ El sistema separa claramente las responsabilidades entre frontend, backend, dato
 
 
 
-\## ⚛️ Frontend
+## 🧱 Arquitectura General
 
 
 
-\### Framework
+[ Cliente (Browser) ]
 
-\- \*\*Next.js (React, App Router)\*\*
+↓
+
+[ Next.js (Views) ]
+
+↓
+
+[ ViewModels / Services ]
+
+↓
+
+[ API Backend (FastAPI / NestJS) ]
+
+↓
+
+[ MySQL ] [ MongoDB ] [ Redis ]
+
+
+
+---
+
+
+
+## ⚛️ Frontend
+
+
+
+### Framework
+
+- **Next.js (React, App Router)**
 
 &nbsp; - SSR / SSG / ISR
 
@@ -114,25 +114,25 @@ El sistema separa claramente las responsabilidades entre frontend, backend, dato
 
 
 
-\### Estilos y UI
+### Estilos y UI
 
-\- \*\*Tailwind CSS\*\* → estilos utilitarios
+- **Tailwind CSS** → estilos utilitarios
 
-\- \*\*Radix UI\*\* → componentes accesibles (headless)
+- **Radix UI** → componentes accesibles (headless)
 
-\- \*\*CVA (class-variance-authority)\*\* → variantes limpias
+- **CVA (class-variance-authority)** → variantes limpias
 
-\- \*\*Framer Motion\*\* → animaciones
+- **Framer Motion** → animaciones
 
-\- \*\*Lucide Icons\*\*
+- **Lucide Icons**
 
 
 
-\### Formularios y validación
+### Formularios y validación
 
-\- React Hook Form
+- React Hook Form
 
-\- Zod
+- Zod
 
 
 
@@ -140,7 +140,7 @@ El sistema separa claramente las responsabilidades entre frontend, backend, dato
 
 
 
-\## 🧩 Patrón MVVM en Frontend
+## 🧩 Patrón MVVM en Frontend
 
 
 
@@ -202,27 +202,27 @@ Estructura:
 
 
 
-\## 🧠 Backend
+## 🧠 Backend
 
 
 
-\### Framework recomendado
+### Framework recomendado
 
-\- \*\*FastAPI (Python)\*\*  
+- **FastAPI (Python)**  
 
-&nbsp; \*(alternativa válida: NestJS si todo el stack es JS)\*
+&nbsp; *(alternativa válida: NestJS si todo el stack es JS)*
 
 
 
-\### Características
+### Características
 
-\- Tipado estricto
+- Tipado estricto
 
-\- Alta performance
+- Alta performance
 
-\- Documentación automática (OpenAPI)
+- Documentación automática (OpenAPI)
 
-\- Ideal para microservicios
+- Ideal para microservicios
 
 
 
@@ -230,29 +230,29 @@ Estructura:
 
 
 
-\## 🗄️ Base de Datos
+## 🗄️ Base de Datos
 
 
 
-\### 🔹 MySQL (Base principal)
+### 🔹 MySQL (Base principal)
 
-\*\*Uso:\*\*
+**Uso:**
 
-\- usuarios
+- usuarios
 
-\- órdenes
+- órdenes
 
-\- pagos
+- pagos
 
-\- stock
+- stock
 
-\- direcciones
+- direcciones
 
-\- cupones
+- cupones
 
 
 
-\*\*Motivo:\*\*  
+**Motivo:**  
 
 ✔ ACID  
 
@@ -266,35 +266,19 @@ Estructura:
 
 
 
-\### 🔹 MongoDB (Complementaria)
+### 🔹 MongoDB (Complementaria)
 
-\*\*Uso:\*\*
+**Uso:**
 
-\- catálogo flexible
+- catálogo flexible
 
-\- atributos dinámicos de productos
+- atributos dinámicos de productos
 
-\- recomendaciones
+- recomendaciones
 
-\- eventos de usuario
+- eventos de usuario
 
-\- logs
-
-
-
----
-
-
-
-\### 🔹 Redis
-
-\- sesiones
-
-\- carrito
-
-\- cache de productos populares
-
-\- tokens
+- logs
 
 
 
@@ -302,33 +286,49 @@ Estructura:
 
 
 
-\## 🖥️ Vistas del Sistema
+### 🔹 Redis
+
+- sesiones
+
+- carrito
+
+- cache de productos populares
+
+- tokens
 
 
 
-\### Público
-
-\- 🏠 Inicio
-
-\- 📰 Blog
-
-\- 🛍️ Catálogo
-
-\- 🛒 Carrito
-
-\- ℹ️ Sobre Nosotros
-
-\- ❓ FAQ
+---
 
 
 
-\### Administración
+## 🖥️ Vistas del Sistema
 
-\- 📦 Inventario
 
-\- 👥 Usuarios
 
-\- 📊 Estadísticos descriptivos:
+### Público
+
+- 🏠 Inicio
+
+- 📰 Blog
+
+- 🛍️ Catálogo
+
+- 🛒 Carrito
+
+- ℹ️ Sobre Nosotros
+
+- ❓ FAQ
+
+
+
+### Administración
+
+- 📦 Inventario
+
+- 👥 Usuarios
+
+- 📊 Estadísticos descriptivos:
 
 &nbsp; - ventas por período
 
@@ -344,17 +344,17 @@ Estructura:
 
 
 
-\## 🤖 Recomendaciones Inteligentes
+## 🤖 Recomendaciones Inteligentes
 
 
 
-\### Estrategia
+### Estrategia
 
-\- Tracking de eventos (views, clicks, compras)
+- Tracking de eventos (views, clicks, compras)
 
-\- Perfilado por cookies
+- Perfilado por cookies
 
-\- Algoritmos:
+- Algoritmos:
 
 &nbsp; - productos relacionados
 
@@ -364,33 +364,13 @@ Estructura:
 
 
 
-\### Tecnologías
+### Tecnologías
 
-\- MongoDB (eventos)
+- MongoDB (eventos)
 
-\- Redis (recomendaciones rápidas)
+- Redis (recomendaciones rápidas)
 
-\- Procesos batch / async
-
-
-
----
-
-
-
-\## 🍪 Cookies y Privacidad
-
-
-
-\- Cookies de sesión
-
-\- Cookies de preferencias
-
-\- Cookies analíticas
-
-\- Cumplimiento GDPR-like
-
-\- Banner de consentimiento configurable
+- Procesos batch / async
 
 
 
@@ -398,37 +378,19 @@ Estructura:
 
 
 
-\## 🌐 Hosting e Infraestructura
+## 🍪 Cookies y Privacidad
 
 
 
-\### Dominio
+- Cookies de sesión
 
-\- \*\*NIC Chile (.cl)\*\*
+- Cookies de preferencias
 
+- Cookies analíticas
 
+- Cumplimiento GDPR-like
 
-\### Infraestructura recomendada
-
-\- \*\*Frontend:\*\* Vercel
-
-\- \*\*Backend:\*\* AWS / GCP (Brasil o USA)
-
-\- \*\*DB:\*\* MySQL administrado
-
-\- \*\*CDN + DNS + WAF:\*\* Cloudflare
-
-
-
-\### Beneficios
-
-\- baja latencia en Chile
-
-\- escalabilidad automática
-
-\- alta disponibilidad
-
-\- SSL y DDoS incluidos
+- Banner de consentimiento configurable
 
 
 
@@ -436,59 +398,37 @@ Estructura:
 
 
 
-\## 🔍 Estrategia SEO (SEO-First)
+## 🌐 Hosting e Infraestructura
 
 
 
-\### Técnicas clave
+### Dominio
 
-\- SSR / ISR en Next.js
-
-\- URLs semánticas
-
-\- Meta tags dinámicos
-
-\- Open Graph
-
-\- Sitemap automático
-
-\- Schema.org (productos, reviews, FAQ)
-
-\- Imágenes optimizadas
-
-\- Core Web Vitals
+- **NIC Chile (.cl)**
 
 
 
-\### Contenido
+### Infraestructura recomendada
 
-\- Blog indexable
+- **Frontend:** Vercel
 
-\- Categorías optimizadas
+- **Backend:** AWS / GCP (Brasil o USA)
 
-\- Rich snippets en productos
+- **DB:** MySQL administrado
 
-
-
----
+- **CDN + DNS + WAF:** Cloudflare
 
 
 
-\## 🔐 Seguridad
+### Beneficios
 
+- baja latencia en Chile
 
+- escalabilidad automática
 
-\- HTTPS obligatorio
+- alta disponibilidad
 
-\- JWT / OAuth
-
-\- Rate limiting
-
-\- Validaciones server-side
-
-\- WAF (Cloudflare)
-
-\- Protección CSRF / XSS
+- SSL y DDoS incluidos
 
 
 
@@ -496,19 +436,37 @@ Estructura:
 
 
 
-\## 🚀 Escalabilidad
+## 🔍 Estrategia SEO (SEO-First)
 
 
 
-\- Cache agresivo
+### Técnicas clave
 
-\- Réplicas de lectura
+- SSR / ISR en Next.js
 
-\- Separación lectura/escritura
+- URLs semánticas
 
-\- Microservicios futuros
+- Meta tags dinámicos
 
-\- Eventual consistency para métricas
+- Open Graph
+
+- Sitemap automático
+
+- Schema.org (productos, reviews, FAQ)
+
+- Imágenes optimizadas
+
+- Core Web Vitals
+
+
+
+### Contenido
+
+- Blog indexable
+
+- Categorías optimizadas
+
+- Rich snippets en productos
 
 
 
@@ -516,7 +474,49 @@ Estructura:
 
 
 
-\## 📦 Objetivo del Proyecto
+## 🔐 Seguridad
+
+
+
+- HTTPS obligatorio
+
+- JWT / OAuth
+
+- Rate limiting
+
+- Validaciones server-side
+
+- WAF (Cloudflare)
+
+- Protección CSRF / XSS
+
+
+
+---
+
+
+
+## 🚀 Escalabilidad
+
+
+
+- Cache agresivo
+
+- Réplicas de lectura
+
+- Separación lectura/escritura
+
+- Microservicios futuros
+
+- Eventual consistency para métricas
+
+
+
+---
+
+
+
+## 📦 Objetivo del Proyecto
 
 
 
@@ -524,33 +524,13 @@ Este repositorio está pensado como:
 
 
 
-\- base para múltiples e-commerce
+- base para múltiples e-commerce
 
-\- plantilla profesional
+- plantilla profesional
 
-\- proyecto demostrable
+- proyecto demostrable
 
-\- sistema listo para crecer
-
-
-
----
-
-
-
-\## 📈 Roadmap Futuro
-
-
-
-\- ElasticSearch para búsqueda
-
-\- Machine Learning para recomendaciones
-
-\- Multi-idioma
-
-\- Multi-moneda
-
-\- Integraciones ERP / contabilidad
+- sistema listo para crecer
 
 
 
@@ -558,11 +538,31 @@ Este repositorio está pensado como:
 
 
 
-\## 👤 Autor
+## 📈 Roadmap Futuro
 
 
 
-\*\*Martín Papic\*\*  
+- ElasticSearch para búsqueda
+
+- Machine Learning para recomendaciones
+
+- Multi-idioma
+
+- Multi-moneda
+
+- Integraciones ERP / contabilidad
+
+
+
+---
+
+
+
+## 👤 Autor
+
+
+
+**Martín Papic**  
 
 Ingeniería en Informática – DUOC UC  
 
