@@ -17,7 +17,7 @@ export function useProductViewModel() {
             const data = await productService.getProducts();
             setProducts(data);
         } catch (err) {
-            setError("Failed to fetch products.");
+            setError("Error al cargar los productos.");
             console.error(err);
         } finally {
             setLoading(false);

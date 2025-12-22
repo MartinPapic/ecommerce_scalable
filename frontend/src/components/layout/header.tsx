@@ -16,13 +16,13 @@ export function Header() {
                     </Link>
                     <nav className="flex items-center space-x-6 text-sm font-medium">
                         <Link href="/catalog" className="transition-colors hover:text-foreground/80 text-foreground/60">
-                            Catalog
+                            Catálogo
                         </Link>
                         <Link href="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">
                             Blog
                         </Link>
                         <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
-                            About
+                            Nosotros
                         </Link>
                     </nav>
                 </div>
@@ -30,7 +30,7 @@ export function Header() {
                 {/* Mobile Menu Button - Placeholder */}
                 <Button variant="ghost" className="mr-2 md:hidden" size="icon">
                     <Menu className="h-5 w-5" />
-                    <span className="sr-only">Menu</span>
+                    <span className="sr-only">Menú</span>
                 </Button>
                 <Link href="/" className="mr-6 flex items-center md:hidden">
                     <span className="font-bold">EcoStore</span>
@@ -42,13 +42,13 @@ export function Header() {
                         <Button variant="ghost" size="icon">
                             <Link href="/cart">
                                 <ShoppingCart className="h-5 w-5" />
-                                <span className="sr-only">Cart</span>
+                                <span className="sr-only">Carrito</span>
                             </Link>
                         </Button>
                         <Button variant="ghost" size="icon">
                             <Link href="/profile">
                                 <User className="h-5 w-5" />
-                                <span className="sr-only">Profile</span>
+                                <span className="sr-only">Perfil</span>
                             </Link>
                         </Button>
                     </nav>

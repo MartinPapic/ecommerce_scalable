@@ -15,15 +15,15 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       <section className="mb-12 text-center">
         <h1 className="mb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Welcome to <span className="text-primary">EcoStore</span>
+          Bienvenido a <span className="text-primary">EcoStore</span>
         </h1>
         <p className="text-xl text-muted-foreground">
-          Sustainable products for a better future.
+          Productos sostenibles para un futuro mejor.
         </p>
       </section>
 
       <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight">Featured Products</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Productos Destacados</h2>
       </div>
 
       {error && (
@@ -69,7 +69,7 @@ export default function Home() {
               </CardContent>
               <CardFooter>
                 <Button className="w-full">
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                  <ShoppingCart className="mr-2 h-4 w-4" /> Agregar
                 </Button>
               </CardFooter>
             </Card>

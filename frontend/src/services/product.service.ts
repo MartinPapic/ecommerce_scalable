@@ -4,19 +4,19 @@ import { Product } from "@/models/product";
 const MOCK_PRODUCTS: Product[] = [
     {
         id: "1",
-        name: "Eco-Friendly Water Bottle",
-        description: "Sustainable 500ml stainless steel water bottle.",
+        name: "Botella de Agua Ecológica",
+        description: "Botella de acero inoxidable de 500ml, sostenible y duradera.",
         price: 25.99,
         imageUrl: "/file.svg", // Placeholder
-        category: "Accessories",
+        category: "Accesorios",
     },
     {
         id: "2",
-        name: "Organic Cotton T-Shirt",
-        description: "100% organic cotton basic t-shirt.",
+        name: "Camiseta de Algodón Orgánico",
+        description: "Camiseta básica 100% algodón orgánico.",
         price: 19.99,
         imageUrl: "/globe.svg", // Placeholder
-        category: "Clothing",
+        category: "Ropa",
     },
 ];
 
