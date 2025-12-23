@@ -10,16 +10,27 @@ import { CartSheet } from "@/components/cart/cart-sheet"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 
+import { authService } from "@/services/auth.service"
+
 export function Header() {
     const { items, toggleCart } = useCartStore()
     const [mounted, setMounted] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
 
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
 
     // Prevent hydration mismatch for persisted store
     useEffect(() => {
         setMounted(true)
+        checkAdmin()
     }, [])
+
+    const checkAdmin = async () => {
+        const user = await authService.getCurrentUser();
+        if (user && user.is_admin) {
+            setIsAdmin(true);
+        }
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -40,6 +51,11 @@ export function Header() {
                         <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
                             Nosotros
                         </Link>
+                        {isAdmin && (
+                            <Link href="/admin/products" className="transition-colors hover:text-primary font-bold text-primary">
+                                Dashboard
+                            </Link>
+                        )}
                     </nav>
                 </div>
 

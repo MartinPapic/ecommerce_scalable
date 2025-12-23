@@ -41,5 +41,23 @@ export const authService = {
 
     isAuthenticated(): boolean {
         return !!this.getToken();
+    },
+
+    async getCurrentUser(): Promise<any | null> {
+        const token = this.getToken();
+        if (!token) return null;
+
+        try {
+            const res = await fetch(`${API_URL}/users/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch (error) {
+            console.error("Error fetching current user:", error);
+            return null;
+        }
     }
 };

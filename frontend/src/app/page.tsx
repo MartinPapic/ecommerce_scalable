@@ -10,9 +10,27 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart } from "lucide-react";
 
 import { SearchBar } from "@/components/search-bar";
+import { CategoryFilter } from "@/components/category-filter";
+import { PaginationControls } from "@/components/pagination-controls";
+import { useState } from "react";
 
 export default function Home() {
-  const { products, loading, error, refreshProducts } = useProductViewModel();
+  const { products, loading, error, refreshProducts, page, totalPages, setPage } = useProductViewModel();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const handleSearch = (query: string) => {
+    // Keep category filter active when searching
+    refreshProducts({ search: query, category: selectedCategory || undefined });
+  };
+
+  const handleCategorySelect = (category: string | null) => {
+    setSelectedCategory(category);
+    // Reset search for clarity when switching categories, or keep it?
+    // Let's keep it simple: switching category refreshes with that category.
+    // Ideally we would sync both, but we need search state lifted up or passed down.
+    // For now: just refresh with category (clears search implicitly if we don't pass 'q')
+    refreshProducts({ category: category || undefined });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -23,8 +41,9 @@ export default function Home() {
         <p className="text-xl text-muted-foreground mb-8">
           Productos sostenibles para un futuro mejor.
         </p>
-        <div className="flex justify-center">
-          <SearchBar onSearch={refreshProducts} />
+        <div className="flex flex-col items-center gap-4">
+          <SearchBar onSearch={handleSearch} />
+          <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleCategorySelect} />
         </div>
       </section>
 
@@ -83,6 +102,12 @@ export default function Home() {
             </Link>
           ))}
       </div>
+
+      <PaginationControls
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

@@ -6,16 +6,20 @@ export function useProductViewModel() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const limit = 12;
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        fetchProducts({ page });
+    }, [page]);
 
-    const fetchProducts = async (query?: string) => {
+    const fetchProducts = async (params?: { search?: string, category?: string, page?: number }) => {
         try {
             setLoading(true);
-            const data = await productService.getProducts({ search: query });
-            setProducts(data);
+            const data = await productService.getProducts({ ...params, page: params?.page || page, limit });
+            setProducts(data.items);
+            setTotalPages(Math.ceil(data.total / limit));
         } catch (err) {
             setError("Error al cargar los productos.");
             console.error(err);
@@ -28,6 +32,12 @@ export function useProductViewModel() {
         products,
         loading,
         error,
-        refreshProducts: fetchProducts,
+        page,
+        totalPages,
+        setPage,
+        refreshProducts: (params?: { search?: string, category?: string }) => {
+            setPage(1); // Reset to page 1 on new filter
+            fetchProducts({ ...params, page: 1 });
+        },
     };
 }

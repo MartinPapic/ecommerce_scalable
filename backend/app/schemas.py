@@ -16,6 +16,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    is_admin: bool = False
 
     class Config:
         from_attributes = True # Changed from orm_mode to from_attributes for Pydantic v2 compatibility
@@ -59,3 +60,8 @@ class Product(ProductBase):
 
     class Config:
         from_attributes = True
+
+class PaginatedProductResponse(BaseModel):
+    items: list[Product]
+    total: int
+

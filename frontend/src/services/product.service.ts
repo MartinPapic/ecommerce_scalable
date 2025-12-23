@@ -4,26 +4,32 @@ import { Product } from "@/models/product";
 const API_URL = "http://localhost:8000";
 
 export class ProductService {
-    async getProducts(params?: { search?: string, category?: string }): Promise<Product[]> {
+    async getProducts(params?: { search?: string, category?: string, page?: number, limit?: number }): Promise<{ items: Product[], total: number }> {
         const url = new URL(`${API_URL}/products`);
         if (params?.search) url.searchParams.append('q', params.search);
         if (params?.category) url.searchParams.append('category', params.category);
+
+        const page = params?.page || 1;
+        const limit = params?.limit || 12;
+        const skip = (page - 1) * limit;
+
+        url.searchParams.append('skip', skip.toString());
+        url.searchParams.append('limit', limit.toString());
 
         const res = await fetch(url.toString());
         if (!res.ok) {
             throw new Error("Error fetching products");
         }
         const data = await res.json();
-        // Map snake_case from python to camelCase if necessary, 
-        // but we defined Pydantic schema to match closely or we need to adjust types.
-        // Python sends { id, name, description, price, image_url, category }
-        // Frontend expects { id, name, description, price, imageUrl, category }
 
-        return data.map((item: any) => ({
-            ...item,
-            id: item.id.toString(), // Ensure ID is string for frontend
-            imageUrl: item.image_url // Map snake to camel
-        }));
+        return {
+            items: data.items.map((item: any) => ({
+                ...item,
+                id: item.id.toString(),
+                imageUrl: item.image_url
+            })),
+            total: data.total
+        };
     }
 
     async getProductById(id: string): Promise<Product | undefined> {
@@ -43,6 +49,12 @@ export class ProductService {
             console.error(error);
             return undefined;
         }
+    }
+
+    async getCategories(): Promise<string[]> {
+        const res = await fetch(`${API_URL}/categories`);
+        if (!res.ok) return [];
+        return await res.json();
     }
 
     async createProduct(product: Omit<Product, 'id'>): Promise<Product | null> {

@@ -32,7 +32,7 @@ def get_db():
 def read_root():
     return {"message": "Ecommerce API is running"}
 
-@app.get("/products", response_model=List[schemas.Product])
+@app.get("/products", response_model=schemas.PaginatedProductResponse)
 def read_products(
     skip: int = 0, 
     limit: int = 100, 
@@ -51,16 +51,27 @@ def read_products(
     
     if category:
         query = query.filter(models.Product.category == category)
-        
+    
+    total = query.count()
     products = query.offset(skip).limit(limit).all()
-    return products
+    
+    return {"items": products, "total": total}
 
 @app.get("/products/{product_id}", response_model=schemas.Product)
 def read_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
     return product
+
+@app.get("/categories", response_model=List[str])
+def read_categories(db: Session = Depends(get_db)):
+    # Efficiently get distinct categories
+    categories = db.query(models.Product.category).distinct().all()
+    # categories is a list of tuples [('Ropa',), ('Hogar',)], flatten it
+    return [c[0] for c in categories if c[0]]
 
 # Security & Auth
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
