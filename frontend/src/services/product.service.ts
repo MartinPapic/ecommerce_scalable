@@ -1,41 +1,31 @@
 import { Product } from "@/models/product";
 
-// Mock data for now
-const MOCK_PRODUCTS: Product[] = [
-    {
-        id: "1",
-        name: "Botella de Agua Ecológica",
-        description: "Botella de acero inoxidable de 500ml, sostenible y duradera.",
-        price: 25.99,
-        imageUrl: "/file.svg", // Placeholder
-        category: "Accesorios",
-    },
-    {
-        id: "2",
-        name: "Camiseta de Algodón Orgánico",
-        description: "Camiseta básica 100% algodón orgánico.",
-        price: 19.99,
-        imageUrl: "/globe.svg", // Placeholder
-        category: "Ropa",
-    },
-];
+
+const API_URL = "http://localhost:8000";
 
 export class ProductService {
     async getProducts(): Promise<Product[]> {
-        // Simulate network latency
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(MOCK_PRODUCTS);
-            }, 1000);
-        });
+        const res = await fetch(`${API_URL}/products`);
+        if (!res.ok) {
+            throw new Error("Error fetching products");
+        }
+        const data = await res.json();
+        // Map snake_case from python to camelCase if necessary, 
+        // but we defined Pydantic schema to match closely or we need to adjust types.
+        // Python sends { id, name, description, price, image_url, category }
+        // Frontend expects { id, name, description, price, imageUrl, category }
+
+        return data.map((item: any) => ({
+            ...item,
+            id: item.id.toString(), // Ensure ID is string for frontend
+            imageUrl: item.image_url // Map snake to camel
+        }));
     }
 
     async getProductById(id: string): Promise<Product | undefined> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(MOCK_PRODUCTS.find((p) => p.id === id));
-            }, 500);
-        });
+        // Placeholder for now, later implement API endpoint
+        const products = await this.getProducts();
+        return products.find((p) => p.id === id);
     }
 }
 
