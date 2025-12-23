@@ -11,10 +11,10 @@ export function useProductViewModel() {
         fetchProducts();
     }, []);
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (query?: string) => {
         try {
             setLoading(true);
-            const data = await productService.getProducts();
+            const data = await productService.getProducts({ search: query });
             setProducts(data);
         } catch (err) {
             setError("Error al cargar los productos.");

@@ -7,6 +7,50 @@ class ProductBase(BaseModel):
     image_url: str
     category: str
 
+class UserBase(BaseModel):
+    email: str
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        from_attributes = True # Changed from orm_mode to from_attributes for Pydantic v2 compatibility
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: str | None = None
+
+class OrderItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+
+class OrderCreate(BaseModel):
+    items: list[OrderItemCreate]
+
+class OrderItemResponse(BaseModel):
+    product_id: int
+    quantity: int
+    price: float
+    
+    class Config:
+        from_attributes = True
+
+class OrderResponse(BaseModel):
+    id: int
+    total_amount: float
+    status: str
+    items: list[OrderItemResponse]
+
+    class Config:
+        from_attributes = True
+
 class ProductCreate(ProductBase):
     pass
 

@@ -4,8 +4,12 @@ import { Product } from "@/models/product";
 const API_URL = "http://localhost:8000";
 
 export class ProductService {
-    async getProducts(): Promise<Product[]> {
-        const res = await fetch(`${API_URL}/products`);
+    async getProducts(params?: { search?: string, category?: string }): Promise<Product[]> {
+        const url = new URL(`${API_URL}/products`);
+        if (params?.search) url.searchParams.append('q', params.search);
+        if (params?.category) url.searchParams.append('category', params.category);
+
+        const res = await fetch(url.toString());
         if (!res.ok) {
             throw new Error("Error fetching products");
         }
@@ -23,9 +27,63 @@ export class ProductService {
     }
 
     async getProductById(id: string): Promise<Product | undefined> {
-        // Placeholder for now, later implement API endpoint
-        const products = await this.getProducts();
-        return products.find((p) => p.id === id);
+        try {
+            const res = await fetch(`${API_URL}/products/${id}`);
+            if (!res.ok) {
+                if (res.status === 404) return undefined;
+                throw new Error("Error fetching product");
+            }
+            const item = await res.json();
+            return {
+                ...item,
+                id: item.id.toString(),
+                imageUrl: item.image_url
+            };
+        } catch (error) {
+            console.error(error);
+            return undefined;
+        }
+    }
+
+    async createProduct(product: Omit<Product, 'id'>): Promise<Product | null> {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_URL}/products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    image_url: product.imageUrl,
+                    category: product.category
+                })
+            });
+            if (!res.ok) return null;
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+
+    async deleteProduct(id: string): Promise<boolean> {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`${API_URL}/products/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return res.ok;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
 }
 

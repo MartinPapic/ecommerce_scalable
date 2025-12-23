@@ -1,10 +1,26 @@
+"use client"
+
 import Link from "next/link"
 import { ShoppingCart, Menu, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
+import { useCartStore } from "@/lib/store"
+import { CartSheet } from "@/components/cart/cart-sheet"
+import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from "react"
 
 export function Header() {
+    const { items, toggleCart } = useCartStore()
+    const [mounted, setMounted] = useState(false)
+
+    const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+
+    // Prevent hydration mismatch for persisted store
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 items-center px-4">
@@ -39,13 +55,18 @@ export function Header() {
                 <div className="flex flex-1 items-center justify-end space-x-2">
                     <nav className="flex items-center space-x-2">
                         <ModeToggle />
-                        <Button variant="ghost" size="icon">
-                            <Link href="/cart">
-                                <ShoppingCart className="h-5 w-5" />
-                                <span className="sr-only">Carrito</span>
-                            </Link>
+
+                        <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+                            <ShoppingCart className="h-5 w-5" />
+                            {mounted && cartCount > 0 && (
+                                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px]">
+                                    {cartCount}
+                                </Badge>
+                            )}
+                            <span className="sr-only">Carrito</span>
                         </Button>
-                        <Button variant="ghost" size="icon">
+
+                        <Button variant="ghost" size="icon" asChild>
                             <Link href="/profile">
                                 <User className="h-5 w-5" />
                                 <span className="sr-only">Perfil</span>
@@ -54,6 +75,9 @@ export function Header() {
                     </nav>
                 </div>
             </div>
+
+            {/* Render the Cart Sheet here so it is available globally */}
+            <CartSheet />
         </header>
     )
 }
