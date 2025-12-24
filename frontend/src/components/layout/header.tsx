@@ -1,36 +1,31 @@
 "use client"
 
 import Link from "next/link"
-import { ShoppingCart, Menu, User } from "lucide-react"
+import { ShoppingCart, Menu, User, LayoutDashboard, LogOut } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import { useCartStore } from "@/lib/store"
+import { useAuthStore } from "@/lib/auth-store"
 import { CartSheet } from "@/components/cart/cart-sheet"
 import { Badge } from "@/components/ui/badge"
-import { useEffect, useState } from "react"
-
-import { authService } from "@/services/auth.service"
 
 export function Header() {
+    const router = useRouter()
     const { items, toggleCart } = useCartStore()
+    const { user, isAuthenticated, checkAuth } = useAuthStore()
     const [mounted, setMounted] = useState(false)
-    const [isAdmin, setIsAdmin] = useState(false)
 
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+    const isAdmin = user?.is_admin || false
 
-    // Prevent hydration mismatch for persisted store
+    // Prevent hydration mismatch & Check auth on mount
     useEffect(() => {
         setMounted(true)
-        checkAdmin()
+        checkAuth()
     }, [])
-
-    const checkAdmin = async () => {
-        const user = await authService.getCurrentUser();
-        if (user && user.is_admin) {
-            setIsAdmin(true);
-        }
-    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -51,11 +46,6 @@ export function Header() {
                         <Link href="/about" className="transition-colors hover:text-foreground/80 text-foreground/60">
                             Nosotros
                         </Link>
-                        {isAdmin && (
-                            <Link href="/admin/products" className="transition-colors hover:text-primary font-bold text-primary">
-                                Dashboard
-                            </Link>
-                        )}
                     </nav>
                 </div>
 
@@ -70,6 +60,14 @@ export function Header() {
 
                 <div className="flex flex-1 items-center justify-end space-x-2">
                     <nav className="flex items-center space-x-2">
+                        {isAdmin && (
+                            <Button variant="ghost" size="icon" asChild>
+                                <Link href="/admin/products">
+                                    <LayoutDashboard className="h-5 w-5" />
+                                    <span className="sr-only">Panel</span>
+                                </Link>
+                            </Button>
+                        )}
                         <ModeToggle />
 
                         <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
@@ -83,9 +81,9 @@ export function Header() {
                         </Button>
 
                         <Button variant="ghost" size="icon" asChild>
-                            <Link href="/profile">
+                            <Link href={isAuthenticated ? "/profile" : "/login"}>
                                 <User className="h-5 w-5" />
-                                <span className="sr-only">Perfil</span>
+                                <span className="sr-only">{isAuthenticated ? "Perfil" : "Iniciar Sesión"}</span>
                             </Link>
                         </Button>
                     </nav>

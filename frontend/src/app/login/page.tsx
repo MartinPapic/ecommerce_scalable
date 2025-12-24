@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
+import { useAuthStore } from "@/lib/auth-store";
 import { Button } from "@/components/ui/button";
 // We'll use standard HTML inputs if Shadcn Input isn't installed, 
 // but let's assume we can use basic styling or install input/label.
@@ -25,9 +26,10 @@ export default function LoginPage() {
 
         const success = await authService.login(username, password);
         if (success) {
+            // Update the global store
+            await useAuthStore.getState().checkAuth();
             router.push("/");
-            // Force reload to update header state if it was using stored token (optional)
-            // window.location.href = "/"; 
+            // Force reload is no longer needed with proper state management
         } else {
             setError("Credenciales inválidas");
         }
@@ -80,6 +82,15 @@ export default function LoginPage() {
                         </Button>
                     </CardFooter>
                 </form>
+                <div className="p-4 text-center text-sm text-muted-foreground">
+                    ¿No tienes una cuenta?{" "}
+                    <span
+                        className="underline cursor-pointer hover:text-primary"
+                        onClick={() => router.push("/register")}
+                    >
+                        Registrarse
+                    </span>
+                </div>
             </Card>
         </div>
     );

@@ -13,10 +13,14 @@ import { SearchBar } from "@/components/search-bar";
 import { CategoryFilter } from "@/components/category-filter";
 import { PaginationControls } from "@/components/pagination-controls";
 import { useState } from "react";
+import { useCartStore } from "@/lib/store";
+import { toast } from "sonner";
 
 export default function Home() {
   const { products, loading, error, refreshProducts, page, totalPages, setPage } = useProductViewModel();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { addItem } = useCartStore();
 
   const handleSearch = (query: string) => {
     // Keep category filter active when searching
@@ -30,6 +34,15 @@ export default function Home() {
     // Ideally we would sync both, but we need search state lifted up or passed down.
     // For now: just refresh with category (clears search implicitly if we don't pass 'q')
     refreshProducts({ category: category || undefined });
+  };
+
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product);
+    toast.success("Producto añadido con éxito", {
+      description: `${product.name} se ha añadido a tu compra.`
+    });
   };
 
   return (
@@ -93,9 +106,15 @@ export default function Home() {
                     {product.description}
                   </p>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full">
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Ver Detalles
+                <CardFooter className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" className="w-full">
+                    Ver
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={(e) => handleAddToCart(e, product)}
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" /> Agregar
                   </Button>
                 </CardFooter>
               </Card>

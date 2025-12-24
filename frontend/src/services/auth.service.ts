@@ -1,6 +1,20 @@
 const API_URL = "http://localhost:8000";
 
 export const authService = {
+    async register(email: string, password: string): Promise<boolean> {
+        try {
+            const res = await fetch(`${API_URL}/users`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password, is_admin: false }),
+            });
+            return res.ok;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
     async login(username: string, password: string): Promise<boolean> {
         const formData = new URLSearchParams();
         formData.append('username', username);
@@ -21,6 +35,7 @@ export const authService = {
 
             const data = await res.json();
             localStorage.setItem('token', data.access_token);
+            // window.dispatchEvent(new Event('auth-change'));
             return true;
         } catch (error) {
             console.error(error);
@@ -30,6 +45,7 @@ export const authService = {
 
     logout() {
         localStorage.removeItem('token');
+        // window.dispatchEvent(new Event('auth-change'));
     },
 
     getToken(): string | null {

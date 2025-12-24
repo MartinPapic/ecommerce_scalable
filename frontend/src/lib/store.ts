@@ -37,12 +37,12 @@ export const useCartStore = create<CartState>()(
                                 ? { ...item, quantity: item.quantity + 1 }
                                 : item
                         ),
-                        isOpen: true,
+                        // isOpen: true, // behavior disabled by request
                     });
                 } else {
                     set({
                         items: [...currentItems, { ...product, quantity: 1 }],
-                        isOpen: true,
+                        // isOpen: true, // behavior disabled by request
                     });
                 }
             },

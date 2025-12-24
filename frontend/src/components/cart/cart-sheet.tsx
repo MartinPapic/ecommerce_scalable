@@ -28,39 +28,14 @@ export function CartSheet() {
     const [loading, setLoading] = useState(false);
     const { clearCart } = useCartStore();
 
-    const handleCheckout = async () => {
-        if (!authService.isAuthenticated()) {
-            setOpen(false);
-            toast.error("Debes iniciar sesión para comprar", {
-                description: "Redirigiendo al login...",
-            });
-            router.push("/login");
-            return;
-        }
-
-        setLoading(true);
-        const orderItems = items.map(item => ({
-            product_id: parseInt(item.id),
-            quantity: item.quantity
-        }));
-
-        const order = await orderService.createOrder(orderItems);
-
-        if (order) {
-            toast.success(`¡Orden #${order.id} creada con éxito!`, {
-                description: "Gracias por tu compra.",
-            });
-            clearCart();
-            setOpen(false);
-        } else {
-            toast.error("Hubo un error al procesar tu orden.");
-        }
-        setLoading(false);
+    const handleCheckout = () => {
+        setOpen(false);
+        router.push("/checkout");
     };
 
     return (
         <Sheet open={isOpen} onOpenChange={setOpen}>
-            <SheetContent className="flex flex-col w-full sm:max-w-md">
+            <SheetContent className="flex flex-col w-full sm:max-w-md m-3 h-[calc(100vh-24px)] rounded-lg border p-1.5">
                 <SheetHeader>
                     <SheetTitle>Tu Carrito ({items.length})</SheetTitle>
                     <SheetDescription>
@@ -70,7 +45,7 @@ export function CartSheet() {
 
                 <Separator className="my-4" />
 
-                <ScrollArea className="flex-1 -mx-6 px-6">
+                <ScrollArea className="flex-1 -mx-1.5 px-4.5">
                     {items.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-64 text-center">
                             <ShoppingCart className="h-12 w-12 text-muted-foreground mb-4" />

@@ -5,6 +5,12 @@ const API_URL = "http://localhost:8000";
 export interface OrderItem {
     product_id: number;
     quantity: number;
+    price: number;
+    product: {
+        name: string;
+        image_url: string;
+        category: string;
+    };
 }
 
 export interface Order {

@@ -97,6 +97,28 @@ export class ProductService {
             return false;
         }
     }
+
+    async uploadImage(file: File): Promise<string | null> {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch(`${API_URL}/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) {
+                throw new Error("Upload failed");
+            }
+
+            const data = await res.json();
+            return data.url;
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            return null;
+        }
+    }
 }
 
 export const productService = new ProductService();

@@ -3,17 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
-import { productService } from "@/services/product.service";
-import { Product } from "@/models/product";
+import { useAdminProductViewModel } from "@/viewmodels/useAdminProductViewModel";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Trash2, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
 import { PaginationControls } from "@/components/pagination-controls";
-
 import { ChevronsUpDown, Check } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,85 +18,38 @@ import { cn } from "@/lib/utils";
 
 export default function AdminProductsPage() {
     const router = useRouter();
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-    // Pagination state
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const limit = 10; // 10 items per page for admin table
+    // ViewModel
+    const {
+        products,
+        loading,
+        page,
+        totalPages,
+        categories,
+        formData,
+        isSheetOpen,
+        setPage,
+        setFormData,
+        setIsSheetOpen,
+        deleteProduct,
+        createProduct,
+        uploadImage
+    } = useAdminProductViewModel();
 
-    // Form state
-    const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-        imageUrl: ""
-    });
-
-    // Combobox state
-    const [categories, setCategories] = useState<string[]>([]);
+    // Local UI State (Combobox)
     const [openCombobox, setOpenCombobox] = useState(false);
     const [categorySearch, setCategorySearch] = useState("");
 
-    const refreshProducts = async () => {
-        setLoading(true);
-        try {
-            // Fetch with auto-pagination parameters
-            const data = await productService.getProducts({ page, limit });
-            setProducts(data.items);
-            setTotalPages(Math.ceil(data.total / limit));
-        } catch (error) {
-            console.error(error);
-            setProducts([]); // Fallback
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchCategories = async () => {
-        const cats = await productService.getCategories();
-        setCategories(cats);
-    };
-
+    // Auth Check
     useEffect(() => {
         if (!authService.isAuthenticated()) {
             router.push("/login");
-            return;
         }
-        refreshProducts();
-        fetchCategories();
-    }, [router, page]); // Refresh when page changes
+    }, [router]);
 
     const handleDelete = async (id: string) => {
         if (confirm("¿Estás seguro de eliminar este producto?")) {
-            const success = await productService.deleteProduct(id);
-            if (success) {
-                toast.success("Producto eliminado");
-                refreshProducts();
-            } else {
-                toast.error("Error al eliminar");
-            }
-        }
-    };
-
-    const handleCreate = async () => {
-        const newProduct = {
-            ...formData,
-            price: parseFloat(formData.price)
-        };
-
-        const result = await productService.createProduct(newProduct);
-        if (result) {
-            toast.success("Producto creado");
-            setIsSheetOpen(false);
-            setFormData({ name: "", description: "", price: "", category: "", imageUrl: "" });
-            refreshProducts();
-            fetchCategories(); // Update categories if a new one was added
-        } else {
-            toast.error("Error al crear producto");
+            await deleteProduct(id);
         }
     };
 
@@ -120,7 +70,7 @@ export default function AdminProductsPage() {
                             <SheetHeader>
                                 <SheetTitle>Agregar Producto</SheetTitle>
                             </SheetHeader>
-                            <div className="grid gap-4 py-4">
+                            <div className="grid gap-4 py-4 p-3">
                                 <div className="grid gap-2">
                                     <Label>Nombre</Label>
                                     <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
@@ -191,12 +141,34 @@ export default function AdminProductsPage() {
                                     </Popover>
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label>URL Imagen</Label>
-                                    <Input value={formData.imageUrl} onChange={e => setFormData({ ...formData, imageUrl: e.target.value })} />
+                                    <Label>Imagen del Producto</Label>
+                                    <div className="flex gap-2 items-center">
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    await uploadImage(file);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    {formData.imageUrl && (
+                                        <div className="mt-2">
+                                            <p className="text-xs text-muted-foreground mb-1">Vista previa:</p>
+                                            <img src={formData.imageUrl} alt="Preview" className="h-20 w-20 object-cover rounded-md border" />
+                                            <Input
+                                                value={formData.imageUrl}
+                                                readOnly
+                                                className="mt-2 text-xs text-muted-foreground bg-muted"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <SheetFooter>
-                                <Button onClick={handleCreate}>Guardar</Button>
+                                <Button onClick={createProduct}>Guardar</Button>
                             </SheetFooter>
                         </SheetContent>
                     </Sheet>

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { authService } from "@/services/auth.service";
-import { orderService, Order } from "@/services/order.service";
+import { useAuthStore } from "@/lib/auth-store";
+import { useOrderViewModel } from "@/viewmodels/useOrderViewModel";
+import { Order } from "@/services/order.service";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,26 +14,17 @@ import { toast } from "sonner";
 
 export default function ProfilePage() {
     const router = useRouter();
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { isAuthenticated, logout, user } = useAuthStore();
+    const { orders, loading } = useOrderViewModel();
 
     useEffect(() => {
-        if (!authService.isAuthenticated()) {
+        if (!isAuthenticated) {
             router.push("/login");
-            return;
         }
-
-        const fetchOrders = async () => {
-            const data = await orderService.getOrders();
-            setOrders(data);
-            setLoading(false);
-        };
-
-        fetchOrders();
-    }, [router]);
+    }, [isAuthenticated, router]);
 
     const handleLogout = () => {
-        authService.logout();
+        logout();
         toast.info("Has cerrado sesión.");
         router.push("/");
     };
@@ -59,8 +51,7 @@ export default function ProfilePage() {
                     <CardContent>
                         <div className="space-y-2">
                             <p className="text-sm font-medium leading-none">Email</p>
-                            <p className="text-sm text-muted-foreground">admin@example.com</p>
-                            {/* In a real app we'd fetch user details properly */}
+                            <p className="text-sm text-muted-foreground">{user?.email || "No disponible"}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -99,11 +90,25 @@ export default function ProfilePage() {
 
                                         <div className="space-y-2">
                                             <p className="text-sm font-semibold">Items:</p>
-                                            <ul className="text-sm space-y-1">
+                                            <ul className="space-y-3 mt-2">
                                                 {order.items.map((item: any, idx: number) => (
-                                                    <li key={idx} className="flex justify-between">
-                                                        <span>Producto #{item.product_id} (x{item.quantity})</span>
-                                                        <span>${item.price}</span>
+                                                    <li key={idx} className="flex items-center gap-4">
+                                                        <div className="h-12 w-12 rounded bg-muted overflow-hidden relative border shrink-0">
+                                                            {item.product && item.product.image_url ? (
+                                                                <img
+                                                                    src={item.product.image_url}
+                                                                    alt={item.product.name}
+                                                                    className="object-cover w-full h-full"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex items-center justify-center h-full text-xs bg-gray-100 text-gray-400">IMG</div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-medium text-sm truncate">{item.product?.name || `Producto #${item.product_id}`}</p>
+                                                            <p className="text-xs text-muted-foreground">Cantidad: {item.quantity}</p>
+                                                        </div>
+                                                        <p className="font-medium text-sm whitespace-nowrap">${item.price}</p>
                                                     </li>
                                                 ))}
                                             </ul>

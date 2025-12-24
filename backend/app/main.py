@@ -1,4 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from fastapi.staticfiles import StaticFiles
+import shutil
+import uuid
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -19,6 +23,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Ensure uploads directory exists
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # Generate unique filename
+    file_extension = file.filename.split(".")[-1]
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = f"{UPLOAD_DIR}/{unique_filename}"
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    return {"url": f"http://localhost:8000/static/{unique_filename}"}
 
 # Dependency
 def get_db():
@@ -168,13 +191,6 @@ def create_order(order: schemas.OrderCreate, current_user: schemas.User = Depend
         )
         db.add(db_item)
     
-    db.commit()
-    db.refresh(db_order)
-    return db_order
-
-@app.get("/orders", response_model=List[schemas.OrderResponse])
-def read_orders(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    orders = db.query(models.Order).filter(models.Order.user_id == current_user.id).order_by(models.Order.created_at.desc()).all()
     db.commit()
     db.refresh(db_order)
     return db_order

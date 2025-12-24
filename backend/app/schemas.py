@@ -39,6 +39,7 @@ class OrderItemResponse(BaseModel):
     product_id: int
     quantity: int
     price: float
+    product: ProductBase # Include basic product details
     
     class Config:
         from_attributes = True
