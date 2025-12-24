@@ -5,4 +5,9 @@ export interface Product {
     price: number;
     imageUrl: string;
     category: string;
+    sku?: string;
+    stockQuantity: number;
+    minStock: number;
+    costPrice: number;
+    supplier?: string;
 }

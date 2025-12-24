@@ -26,7 +26,10 @@ export class ProductService {
             items: data.items.map((item: any) => ({
                 ...item,
                 id: item.id.toString(),
-                imageUrl: item.image_url
+                imageUrl: item.image_url,
+                stockQuantity: item.stock_quantity,
+                minStock: item.min_stock,
+                costPrice: item.cost_price
             })),
             total: data.total
         };
@@ -43,7 +46,10 @@ export class ProductService {
             return {
                 ...item,
                 id: item.id.toString(),
-                imageUrl: item.image_url
+                imageUrl: item.image_url,
+                stockQuantity: item.stock_quantity,
+                minStock: item.min_stock,
+                costPrice: item.cost_price
             };
         } catch (error) {
             console.error(error);

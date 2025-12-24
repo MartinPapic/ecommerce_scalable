@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class ProductBase(BaseModel):
     name: str
@@ -6,6 +7,12 @@ class ProductBase(BaseModel):
     price: float
     image_url: str
     category: str
+    # Inventory
+    sku: str | None = None
+    stock_quantity: int = 0
+    min_stock: int = 5
+    cost_price: float = 0.0
+    supplier: str | None = None
 
 class UserBase(BaseModel):
     email: str
@@ -62,7 +69,37 @@ class Product(ProductBase):
     class Config:
         from_attributes = True
 
+class StockMovementResponse(BaseModel):
+    id: int
+    product_id: int
+    quantity: int
+    movement_type: str
+    reason: str | None = None
+    created_at: datetime
+    product: ProductBase
+
+    class Config:
+        from_attributes = True
+
 class PaginatedProductResponse(BaseModel):
     items: list[Product]
     total: int
+
+class AdminUserResponse(UserBase):
+    id: int
+    is_active: bool
+    is_admin: bool
+    created_at: datetime | None = None
+    last_login: datetime | None = None
+    phone: str | None = None
+    address: str | None = None
+    
+    # Computed metrics
+    total_spent: float = 0
+    orders_count: int = 0
+    ltv_score: int = 0
+    tags: list[str] = []
+
+    class Config:
+        from_attributes = True
 

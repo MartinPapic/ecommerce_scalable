@@ -13,7 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const items = [
         {
-            title: "Gestión de Usuarios",
+            title: "Usuarios",
             href: "/admin/users",
             icon: Users
         },

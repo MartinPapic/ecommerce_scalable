@@ -6,6 +6,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
+from pydantic import BaseModel
 
 from . import models, schemas
 from .database import SessionLocal, engine
@@ -227,13 +228,141 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
     db.refresh(db_product)
     return db_product
 
-@app.delete("/products/{product_id}")
-def delete_product(product_id: int, db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
-    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
     db.delete(db_product)
     db.commit()
     return {"message": "Product deleted"}
+
+@app.get("/admin/users", response_model=List[schemas.AdminUserResponse])
+def read_admin_users(db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    users = db.query(models.User).all()
+    response = []
+    for user in users:
+        # Calculate metrics from orders
+        orders = db.query(models.Order).filter(models.Order.user_id == user.id).all()
+        total_spent = sum(order.total_amount for order in orders)
+        orders_count = len(orders)
+        
+        # Simple Logic for Tags and LTV
+        tags = []
+        if total_spent > 100000:
+            tags.append("VIP")
+        if orders_count > 5:
+            tags.append("Frecuente")
+        if not orders:
+            tags.append("Nuevo")
+            
+        ltv_score = min(int((total_spent / 500000) * 100), 100) # Simple normalization
+        
+        response.append({
+            "id": user.id,
+            "email": user.email,
+            "is_active": user.is_active == 1,
+            "is_admin": user.is_admin,
+            "created_at": user.created_at,
+            "last_login": user.last_login,
+            "phone": user.phone,
+            "address": user.address,
+            "total_spent": total_spent,
+            "orders_count": orders_count,
+            "ltv_score": ltv_score,
+            "tags": tags
+        })
+    return response
+
+@app.get("/admin/users/{user_id}", response_model=schemas.AdminUserResponse)
+def read_admin_user_detail(user_id: int, db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate metrics (Same logic - ideally move to service/util)
+    orders = db.query(models.Order).filter(models.Order.user_id == user.id).all()
+    total_spent = sum(order.total_amount for order in orders)
+    orders_count = len(orders)
+    
+    tags = []
+    if total_spent > 100000:
+        tags.append("VIP")
+    if orders_count > 5:
+        tags.append("Frecuente")
+    if not orders:
+        tags.append("Nuevo")
+        
+    ltv_score = min(int((total_spent / 500000) * 100), 100)
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "is_active": user.is_active == 1,
+        "is_admin": user.is_admin,
+        "created_at": user.created_at,
+        "last_login": user.last_login,
+        "phone": user.phone,
+        "address": user.address,
+        "total_spent": total_spent,
+        "orders_count": orders_count,
+        "ltv_score": ltv_score,
+        "tags": tags
+    }
+
+# Inventory Management
+@app.get("/inventory/dashboard")
+def get_inventory_dashboard(db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    products = db.query(models.Product).all()
+    
+    total_valuation = sum(p.stock_quantity * p.cost_price for p in products)
+    low_stock_count = sum(1 for p in products if p.stock_quantity <= p.min_stock and p.stock_quantity > 0)
+    out_of_stock_count = sum(1 for p in products if p.stock_quantity == 0)
+    
+    return {
+        "total_valuation": total_valuation,
+        "low_stock_count": low_stock_count,
+        "out_of_stock_count": out_of_stock_count,
+        "total_sku": len(products)
+    }
+
+class StockMovementCreate(BaseModel):
+    product_id: int
+    quantity: int
+    movement_type: str # IN, OUT, ADJUSTMENT
+    reason: str | None = None
+
+@app.post("/inventory/movements", response_model=schemas.StockMovementResponse)
+def create_stock_movement(movement: StockMovementCreate, db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    product = db.query(models.Product).filter(models.Product.id == movement.product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Update Product Stock
+    if movement.movement_type == "IN":
+        product.stock_quantity += movement.quantity
+    elif movement.movement_type == "OUT":
+        product.stock_quantity -= movement.quantity
+        if product.stock_quantity < 0:
+             # Option: Allow negative stock or not? For now, allow it but maybe warn.
+             pass
+    elif movement.movement_type == "ADJUSTMENT":
+        # Adjustment sets the absolute stock? Or is it a delta? 
+        # Usually adjustment is a delta too, but let's assume the 'quantity' passed is the DELTA.
+        # If user wants to set exact stock, frontend calculates delta.
+        product.stock_quantity += movement.quantity
+    
+    db_movement = models.StockMovement(
+        product_id=movement.product_id,
+        quantity=movement.quantity,
+        movement_type=movement.movement_type,
+        reason=movement.reason
+    )
+    
+    db.add(db_movement)
+    db.commit()
+    db.refresh(db_movement)
+    return db_movement
+
+@app.get("/inventory/movements", response_model=List[schemas.StockMovementResponse])
+def get_stock_movements(product_id: int | None = None, db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    query = db.query(models.StockMovement)
+    if product_id:
+        query = query.filter(models.StockMovement.product_id == product_id)
+    return query.order_by(models.StockMovement.created_at.desc()).limit(100).all()
 
