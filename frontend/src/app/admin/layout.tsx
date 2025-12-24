@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             icon: Package
         },
         {
-            title: "Estadística Descriptiva",
+            title: "Business Intelligence",
             href: "/admin/stats",
             icon: BarChart3
         },
