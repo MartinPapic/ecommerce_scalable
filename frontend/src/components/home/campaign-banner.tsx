@@ -18,7 +18,7 @@ export function CampaignBanner() {
                     </p>
                     <div className="pt-4">
                         <Button size="lg" variant="secondary" className="text-primary font-bold px-8" asChild>
-                            <Link href="/catalog?discount=true">
+                            <Link href="/shop?discount=true">
                                 Ver Ofertas
                             </Link>
                         </Button>

@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowDown, ArrowUp, RefreshCcw, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowDown, ArrowUp, RefreshCcw, AlertTriangle, Package } from "lucide-react";
 import { Product } from "@/models/product";
 import Link from "next/link";
 import { toast } from "sonner"; // Assuming sonner is installed or uses similar toast

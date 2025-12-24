@@ -103,3 +103,19 @@ class AdminUserResponse(UserBase):
     class Config:
         from_attributes = True
 
+class DailySales(BaseModel):
+    date: str
+    revenue: float
+    orders: int
+
+class CategorySales(BaseModel):
+    name: str
+    value: float
+
+class DashboardStatsResponse(BaseModel):
+    totalRevenue: float
+    totalOrders: int
+    conversionRate: float
+    avgTicket: float
+    salesTrend: list[DailySales]
+    categoryDistribution: list[CategorySales]

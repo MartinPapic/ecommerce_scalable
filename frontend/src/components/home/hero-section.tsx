@@ -26,7 +26,7 @@ export function HeroSection() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
                         <Button size="lg" className="text-base px-8 py-6 h-auto" asChild>
-                            <Link href="/catalog?category=all">Explorar Tienda</Link>
+                            <Link href="/shop?category=all">Explorar Tienda</Link>
                         </Button>
                         <Button size="lg" variant="outline" className="text-base px-8 py-6 h-auto bg-transparent border-white text-white hover:bg-white hover:text-black transition-colors" asChild>
                             <Link href="/about">Nuestra Misión</Link>

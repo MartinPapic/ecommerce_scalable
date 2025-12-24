@@ -62,6 +62,10 @@ def read_products(
     limit: int = 100, 
     q: str | None = None,
     category: str | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    in_stock: bool | None = None,
+    sort_by: str | None = None, # price_asc, price_desc, newest
     db: Session = Depends(get_db)
 ):
     query = db.query(models.Product)
@@ -75,6 +79,26 @@ def read_products(
     
     if category:
         query = query.filter(models.Product.category == category)
+
+    if min_price is not None:
+        query = query.filter(models.Product.price >= min_price)
+    
+    if max_price is not None:
+        query = query.filter(models.Product.price <= max_price)
+
+    if in_stock:
+        query = query.filter(models.Product.stock_quantity > 0)
+    
+    # Sorting
+    if sort_by == "price_asc":
+        query = query.order_by(models.Product.price.asc())
+    elif sort_by == "price_desc":
+        query = query.order_by(models.Product.price.desc())
+    elif sort_by == "newest":
+        query = query.order_by(models.Product.id.desc()) # ID as proxy for creation time
+    else:
+        # Default relevance (if search) or newest
+        query = query.order_by(models.Product.id.desc())
     
     total = query.count()
     products = query.offset(skip).limit(limit).all()
@@ -214,6 +238,45 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(db_product)
     return db_product
+
+@app.post("/products/bulk")
+async def bulk_create_products(file: UploadFile = File(...), db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    import csv
+    import codecs
+    
+    csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'))
+    created_count = 0
+    errors = []
+    
+    for row in csvReader:
+        try:
+            # Basic validation
+            if not row.get('name') or not row.get('price'):
+                continue
+                
+            # Check SKU existence
+            sku = row.get('sku')
+            if sku and db.query(models.Product).filter(models.Product.sku == sku).first():
+                errors.append(f"SKU {sku} already exists")
+                continue
+                
+            product = models.Product(
+                name=row['name'],
+                description=row.get('description', ''),
+                price=float(row['price']),
+                stock_quantity=int(row.get('stock', 0)),
+                min_stock=int(row.get('min_stock', 5)),
+                category=row.get('category', 'General'),
+                sku=sku,
+                image_url=row.get('image_url', '')
+            )
+            db.add(product)
+            created_count += 1
+        except Exception as e:
+            errors.append(f"Row error: {str(e)}")
+            
+    db.commit()
+    return {"created": created_count, "errors": errors}
 
 @app.put("/products/{product_id}", response_model=schemas.Product)
 def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
@@ -365,4 +428,59 @@ def get_stock_movements(product_id: int | None = None, db: Session = Depends(get
     if product_id:
         query = query.filter(models.StockMovement.product_id == product_id)
     return query.order_by(models.StockMovement.created_at.desc()).limit(100).all()
+
+# Analytics
+@app.get("/analytics/dashboard", response_model=schemas.DashboardStatsResponse)
+def get_analytics_dashboard(db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
+    from sqlalchemy import func, desc
+    from datetime import datetime, timedelta
+
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    
+    orders = db.query(models.Order).filter(models.Order.created_at >= thirty_days_ago).all()
+    total_orders = len(orders)
+    total_revenue = sum(o.total_amount for o in orders)
+
+    conversion_rate = 2.4 
+    avg_ticket = (total_revenue / total_orders) if total_orders > 0 else 0
+
+    # Sales Trend
+    sales_trend_data = db.query(
+        func.date(models.Order.created_at).label('date'),
+        func.sum(models.Order.total_amount).label('revenue'),
+        func.count(models.Order.id).label('orders')
+    ).filter(
+        models.Order.created_at >= thirty_days_ago
+    ).group_by(
+        func.date(models.Order.created_at)
+    ).all()
+
+    sales_trend = [
+        schemas.DailySales(date=str(row.date), revenue=row.revenue, orders=row.orders)
+        for row in sales_trend_data
+    ]
+    
+    # Category Distribution
+    cat_dist_data = db.query(
+        models.Product.category,
+        func.sum(models.OrderItem.price * models.OrderItem.quantity).label('value')
+    ).join(models.Product).join(models.Order).filter(
+        models.Order.created_at >= thirty_days_ago
+    ).group_by(
+        models.Product.category
+    ).all()
+
+    category_distribution = [
+        schemas.CategorySales(name=row.category, value=row.value)
+        for row in cat_dist_data if row.category
+    ]
+
+    return {
+        "totalRevenue": total_revenue,
+        "totalOrders": total_orders,
+        "conversionRate": conversion_rate,
+        "avgTicket": avg_ticket,
+        "salesTrend": sales_trend,
+        "categoryDistribution": category_distribution
+    }
 

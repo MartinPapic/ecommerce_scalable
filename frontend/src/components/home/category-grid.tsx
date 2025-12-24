@@ -9,28 +9,28 @@ const categories = [
         name: "Ropa Sostenible",
         description: "Moda ética y materiales orgánicos.",
         image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2670&auto=format&fit=crop",
-        href: "/catalog?category=Ropa"
+        href: "/shop?category=Ropa"
     },
     {
         id: "hogar",
         name: "Hogar & Deco",
         description: "Minimalismo para tu espacio.",
         image: "https://images.unsplash.com/photo-1513161455079-7dc1de15ef3e?q=80&w=2576&auto=format&fit=crop",
-        href: "/catalog?category=Hogar"
+        href: "/shop?category=Hogar"
     },
     {
         id: "tecnologia",
         name: "Eco Tech",
         description: "Gadgets de bajo consumo.",
         image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2702&auto=format&fit=crop",
-        href: "/catalog?category=Tecnologia"
+        href: "/shop?category=Tecnologia"
     },
     {
         id: "accesorios",
         name: "Accesorios",
         description: "Detalles que marcan la diferencia.",
         image: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=2574&auto=format&fit=crop",
-        href: "/catalog?category=Accesorios"
+        href: "/shop?category=Accesorios"
     }
 ];
 
@@ -43,7 +43,7 @@ export function CategoryGrid() {
                         <h2 className="text-3xl font-bold tracking-tight">Categorías</h2>
                         <p className="text-muted-foreground mt-2">Encuentra exactamente lo que buscas.</p>
                     </div>
-                    <Link href="/catalog" className="hidden md:flex items-center text-primary font-medium hover:underline">
+                    <Link href="/shop" className="hidden md:flex items-center text-primary font-medium hover:underline">
                         Ver todas <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </div>
@@ -72,7 +72,7 @@ export function CategoryGrid() {
                 </div>
 
                 <div className="mt-8 text-center md:hidden">
-                    <Link href="/catalog" className="inline-flex items-center text-primary font-medium hover:underline">
+                    <Link href="/shop" className="inline-flex items-center text-primary font-medium hover:underline">
                         Ver todas <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                 </div>

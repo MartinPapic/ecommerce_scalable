@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Package, BarChart3, Home } from "lucide-react";
+import { Users, Package, BarChart3, Home, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -18,8 +18,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             icon: Users
         },
         {
-            title: "Inventario",
-            href: "/admin/products",
+            title: "Control Stock",
+            href: "/admin/inventory",
             icon: Package
         },
         {
@@ -33,7 +33,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex min-h-screen flex-col md:flex-row">
             <aside className="w-full md:w-64 bg-muted/40 border-r p-6 flex flex-col gap-6">
                 <div className="flex items-center gap-2 font-bold text-xl px-2">
-                    <span>Admin Panel</span>
+                    <Link href="/admin" className="flex items-center gap-2">
+                        <LayoutDashboard className="h-6 w-6" />
+                        <span>Admin Panel</span>
+                    </Link>
                 </div>
 
                 <nav className="grid gap-2 text-sm font-medium">

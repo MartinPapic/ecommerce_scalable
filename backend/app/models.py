@@ -66,3 +66,4 @@ class OrderItem(Base):
     price = Column(Float) # Snapshot price at time of purchase
 
     order = relationship("Order", back_populates="items")
+    product = relationship("Product")

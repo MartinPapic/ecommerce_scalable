@@ -37,7 +37,7 @@ export function Header() {
                         </span>
                     </Link>
                     <nav className="flex items-center space-x-6 text-sm font-medium">
-                        <Link href="/catalog" className="transition-colors hover:text-foreground/80 text-foreground/60">
+                        <Link href="/shop" className="transition-colors hover:text-foreground/80 text-foreground/60">
                             Catálogo
                         </Link>
                         <Link href="/blog" className="transition-colors hover:text-foreground/80 text-foreground/60">
@@ -62,7 +62,7 @@ export function Header() {
                     <nav className="flex items-center space-x-2">
                         {isAdmin && (
                             <Button variant="ghost" size="icon" asChild>
-                                <Link href="/admin/products">
+                                <Link href="/admin">
                                     <LayoutDashboard className="h-5 w-5" />
                                     <span className="sr-only">Panel</span>
                                 </Link>

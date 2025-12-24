@@ -7,12 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, AlertTriangle, Package, DollarSign, ArrowUpDown, Filter } from "lucide-react";
+import { Search, AlertTriangle, Package, DollarSign, ArrowUpDown, Filter, Plus, Upload } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function InventoryPage() {
-    const { stats, products, loading, fetchDashboard } = useInventoryViewModel();
+    const {
+        stats, products, loading, fetchDashboard,
+        formData, setFormData, createProduct, uploadImage, isSheetOpen, setIsSheetOpen, categories,
+        handleBulkImport
+    } = useInventoryViewModel();
     const [searchTerm, setSearchTerm] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => {
         fetchDashboard();
@@ -23,15 +41,150 @@ export default function InventoryPage() {
         (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    if (loading && !stats) return <div className="p-8">Cargando inventario...</div>;
+    if (loading) return <div className="p-8">Cargando inventario...</div>;
 
     return (
         <div className="space-y-6 p-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight">Gestión de Inventario</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Tablero de Control de Stock</h1>
                 <div className="flex gap-2">
-                    <Button variant="outline"><Filter className="mr-2 h-4 w-4" /> Filtros</Button>
-                    <Button>Importar Masivo</Button>
+                    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                        <SheetTrigger asChild>
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" /> Nuevo Producto
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent className="overflow-y-auto">
+                            <SheetHeader>
+                                <SheetTitle>Agregar Nuevo SKU</SheetTitle>
+                            </SheetHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label>Nombre del Producto</Label>
+                                    <Input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Categoría</Label>
+                                    <div className="relative group">
+                                        <Input
+                                            value={formData.category}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                            onFocus={() => setIsFocused(true)}
+                                            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                                            placeholder="Ej: Electrónica"
+                                            className="w-full"
+                                        />
+                                        {/* Autocomplete Suggestions */}
+                                        {isFocused && (
+                                            <div className="absolute z-10 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md animate-in fade-in-0 zoom-in-95 max-h-60 overflow-auto">
+                                                <div className="p-1">
+                                                    {categories
+                                                        .filter(c => !formData.category || c.toLowerCase().includes(formData.category.toLowerCase()))
+                                                        .map((cat) => (
+                                                            <div
+                                                                key={cat}
+                                                                className={cn(
+                                                                    "cursor-pointer px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center justify-between",
+                                                                    formData.category === cat && "bg-accent text-accent-foreground"
+                                                                )}
+                                                                onClick={() => {
+                                                                    setFormData({ ...formData, category: cat });
+                                                                    setIsFocused(false);
+                                                                }}
+                                                            >
+                                                                {cat}
+                                                                {formData.category === cat && <Check className="h-4 w-4 opacity-50" />}
+                                                            </div>
+                                                        ))
+                                                    }
+                                                    {categories.length === 0 && (
+                                                        <div className="px-2 py-1.5 text-sm text-muted-foreground italic">
+                                                            No hay categorías guardadas
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Precio de Venta</Label>
+                                    <Input type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Descripción</Label>
+                                    <Input value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Imagen</Label>
+                                    <Input type="file" onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) await uploadImage(file);
+                                    }} />
+                                    {formData.imageUrl && <img src={formData.imageUrl} className="h-20 w-20 object-cover rounded border" />}
+                                </div>
+                            </div>
+                            <SheetFooter>
+                                <Button onClick={createProduct}>Guardar y Crear SKU</Button>
+                            </SheetFooter>
+                        </SheetContent>
+                    </Sheet>
+
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">
+                                <Upload className="mr-2 h-4 w-4" /> Importar Masivo
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Carga Masiva de Productos</DialogTitle>
+                                <DialogDescription>
+                                    Sube un archivo CSV con tus productos. Descarga la plantilla para ver el formato requerido.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="grid gap-4 py-4">
+                                <Button variant="secondary" className="w-full" onClick={() => {
+                                    const csvContent = "data:text/csv;charset=utf-8," + "name,price,stock,min_stock,category,sku,description\nProducto Ejemplo,1000,10,2,General,SKU-001,Descripción del producto";
+                                    const encodedUri = encodeURI(csvContent);
+                                    const link = document.createElement("a");
+                                    link.setAttribute("href", encodedUri);
+                                    link.setAttribute("download", "plantilla_productos.csv");
+                                    document.body.appendChild(link);
+                                    link.click();
+                                }}>
+                                    📥 Descargar Plantilla CSV
+                                </Button>
+
+                                <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 transition-colors">
+                                    <Input
+                                        type="file"
+                                        accept=".csv"
+                                        className="hidden"
+                                        id="csv-upload"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                toast.promise(handleBulkImport(file), {
+                                                    loading: 'Importando productos...',
+                                                    success: (data: any) => `¡Éxito! ${data.created} productos creados.`,
+                                                    error: 'Error al importar'
+                                                });
+                                            }
+                                        }}
+                                    />
+                                    <Label htmlFor="csv-upload" className="cursor-pointer block">
+                                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                            <Upload className="h-8 w-8 mb-2" />
+                                            <span className="font-medium">Click para seleccionar archivo</span>
+                                            <span className="text-xs">o arrastra tu CSV aquí</span>
+                                        </div>
+                                    </Label>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 

@@ -125,6 +125,27 @@ export class ProductService {
             return null;
         }
     }
+
+    async bulkImport(file: File): Promise<{ created: number, errors: string[] } | null> {
+        const formData = new FormData();
+        formData.append("file", file);
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await fetch(`${API_URL}/products/bulk`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            if (!res.ok) throw new Error("Import failed");
+            return await res.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
 }
 
 export const productService = new ProductService();

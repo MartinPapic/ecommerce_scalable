@@ -4,10 +4,63 @@ import { productService } from "@/services/product.service";
 import { Product } from "@/models/product";
 
 export function useInventoryViewModel() {
-    const [stats, setStats] = useState<InventoryStats | null>(null);
+    const [stats, setStats] = useState<InventoryStats>({
+        total_valuation: 0,
+        low_stock_count: 0,
+        out_of_stock_count: 0,
+        total_sku: 0
+    });
     const [products, setProducts] = useState<Product[]>([]);
     const [movements, setMovements] = useState<StockMovement[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Form State (Ported from AdminProductViewModel)
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [formData, setFormData] = useState({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        imageUrl: ""
+    });
+
+    const createProduct = async () => {
+        const newProduct = {
+            ...formData,
+            price: parseFloat(formData.price),
+            stockQuantity: 0,
+            minStock: 5,
+            costPrice: 0
+        };
+
+        const result = await productService.createProduct(newProduct);
+        if (result) {
+            setIsSheetOpen(false);
+            setFormData({ name: "", description: "", price: "", category: "", imageUrl: "" });
+            fetchDashboard(); // Refresh list
+            return true;
+        }
+        return false;
+    };
+
+    const uploadImage = async (file: File) => {
+        const url = await productService.uploadImage(file);
+        if (url) {
+            setFormData(prev => ({ ...prev, imageUrl: url }));
+            return url;
+        }
+        return null;
+    };
+
+    const fetchCategories = async () => {
+        const cats = await productService.getCategories();
+        setCategories(cats);
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     const fetchDashboard = async () => {
         setLoading(true);
@@ -69,6 +122,24 @@ export function useInventoryViewModel() {
         loading,
         fetchDashboard,
         fetchProductDetails,
-        addMovement
+        addMovement,
+        // Creation Actions
+        createProduct,
+        uploadImage,
+        formData,
+        setFormData,
+        isSheetOpen,
+        setIsSheetOpen,
+        categories,
+        // Bulk Import
+        importIds: [] as string[],
+        handleBulkImport: async (file: File) => {
+            const res = await productService.bulkImport(file);
+            if (res) {
+                fetchDashboard();
+                return res;
+            }
+            return null;
+        }
     };
 }

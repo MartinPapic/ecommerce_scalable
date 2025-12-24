@@ -23,10 +23,10 @@ export function Footer() {
                     <div>
                         <h4 className="font-semibold text-white mb-6">Tienda</h4>
                         <ul className="space-y-3 text-sm">
-                            <li><Link href="/catalog?category=new" className="hover:text-white transition-colors">Novedades</Link></li>
-                            <li><Link href="/catalog?category=best-sellers" className="hover:text-white transition-colors">Más Vendidos</Link></li>
-                            <li><Link href="/catalog" className="hover:text-white transition-colors">Catálogo Completo</Link></li>
-                            <li><Link href="/catalog?category=offers" className="hover:text-white transition-colors">Ofertas</Link></li>
+                            <li><Link href="/shop?category=new" className="hover:text-white transition-colors">Novedades</Link></li>
+                            <li><Link href="/shop?category=best-sellers" className="hover:text-white transition-colors">Más Vendidos</Link></li>
+                            <li><Link href="/shop" className="hover:text-white transition-colors">Catálogo Completo</Link></li>
+                            <li><Link href="/shop?category=offers" className="hover:text-white transition-colors">Ofertas</Link></li>
                         </ul>
                     </div>
 
