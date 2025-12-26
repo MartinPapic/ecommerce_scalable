@@ -87,7 +87,7 @@ ecommerce_scalable/
     cd backend
     ```
 
-2.  Crea y activa un entorno virtual:
+2.  Crea y activa un entorno virtual (recomendado):
     ```bash
     # Windows
     python -m venv venv
@@ -100,20 +100,32 @@ ecommerce_scalable/
 
 3.  Instala las dependencias:
     ```bash
+    pip install --upgrade pip
     pip install -r requirements.txt
     ```
 
-4.  Configura la conexión a Base de Datos (Revisar `backend/app/database.py` o configurar variables de entorno si aplica).
+4.  **Configuración de Base de Datos:**
+    *   Asegúrate de tener **MySQL** (o MariaDB) corriendo (ej. XAMPP, Docker, servicio local).
+    *   Crea la base de datos manualmente en tu cliente MySQL:
+        ```sql
+        CREATE DATABASE ecommerce_db;
+        ```
+    *   Verifica la cadena de conexión en `backend/app/database.py`:
+        ```python
+        # Por defecto apunta a: usuario='root', password='', db='ecommerce_db'
+        SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:@localhost/ecommerce_db"
+        ```
+    *   *Si tu MySQL tiene contraseña u otro usuario, edita esa línea en el archivo.*
 
-5.  Ejecuta las migraciones y seeders iniciales:
+5.  Ejecuta las migraciones y seeders iniciales (en orden):
     ```bash
-    python migrate_users.py
-    python migrate_inventory.py
-    python migrate_admin.py
-    python seed_db.py
+    python migrate_users.py      # Crea tablas de usuario
+    python migrate_inventory.py  # Crea tablas de productos e inventario
+    python migrate_admin.py     # Tablas adicionales de admin
+    python seed_db.py           # Pobla la BD con datos de prueba
     ```
 
-6.  (Opcional) Crea un usuario administrador:
+6.  (Opcional) Crea un usuario administrador para el panel:
     ```bash
     python create_admin.py
     ```
@@ -122,8 +134,9 @@ ecommerce_scalable/
     ```bash
     uvicorn app.main:app --reload
     ```
-    *La API estará disponible en `http://localhost:8000`*
-    *Documentación interactiva en `http://localhost:8000/docs`*
+    *   La API estará disponible en: `http://localhost:8000`
+    *   Swagger UI (Docs): `http://localhost:8000/docs`
+    *   Carpeta de imágenes: `backend/uploads` (se crea automáticamente o consérvala para persistencia)
 
 ### 2. Configuración del Frontend
 
