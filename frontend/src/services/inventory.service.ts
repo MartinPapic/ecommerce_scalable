@@ -31,6 +31,11 @@ export const inventoryService = {
         const res = await fetch(`${API_URL}/inventory/dashboard`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
+        if (res.status === 401 || res.status === 403) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+            throw new Error("Sesión expirada o sin permisos");
+        }
         if (!res.ok) throw new Error("Failed to fetch inventory stats");
         return res.json();
     },

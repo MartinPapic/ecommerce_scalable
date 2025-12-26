@@ -18,17 +18,25 @@ export interface DashboardStats {
     categoryDistribution: CategorySales[];
 }
 
+export const API_URL = "http://localhost:8000";
+
 export const analyticsService = {
     async getDashboardStats(): Promise<DashboardStats | null> {
         try {
             const token = localStorage.getItem('token');
             if (!token) return null;
 
-            const res = await fetch("http://localhost:8000/analytics/dashboard", {
+            const res = await fetch(`${API_URL}/analytics/dashboard`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
             });
+
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                throw new Error("Sesión expirada o sin permisos");
+            }
 
             if (!res.ok) throw new Error("Failed to fetch analytics");
 

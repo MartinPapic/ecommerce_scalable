@@ -146,7 +146,7 @@ export default function ProductDetailPage() {
 
                     <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground pt-4">
                         <div className="flex items-center gap-2">
-                            <Truck className="h-4 w-4" /> Envío gratis > $50.000
+                            <Truck className="h-4 w-4" /> Envío gratis &gt; $50.000
                         </div>
                         <div className="flex items-center gap-2">
                             <ShieldCheck className="h-4 w-4" /> Garantía de 6 meses

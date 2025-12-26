@@ -1,10 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Users, Package, BarChart3, Home, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { authService } from "@/services/auth.service";
+import { toast } from "sonner";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -28,6 +31,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             icon: BarChart3
         },
     ];
+
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        checkAdmin();
+    }, []);
+
+    const checkAdmin = async () => {
+        const user = await authService.getCurrentUser();
+        if (!user || !user.is_admin) {
+            toast.error("Acceso denegado. Se requieren permisos de administrador.");
+            router.push("/"); // Redirect to home or login
+            return;
+        }
+        setIsAdmin(true);
+    };
+
+    if (isAdmin === null) {
+        return <div className="flex h-screen items-center justify-center">Verificando permisos...</div>;
+    }
+
+    if (isAdmin === false) {
+        return null; // Should have redirected
+    }
 
     return (
         <div className="flex min-h-screen flex-col md:flex-row">

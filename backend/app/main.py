@@ -302,7 +302,7 @@ def read_admin_users(db: Session = Depends(get_db), admin: schemas.User = Depend
     for user in users:
         # Calculate metrics from orders
         orders = db.query(models.Order).filter(models.Order.user_id == user.id).all()
-        total_spent = sum(order.total_amount for order in orders)
+        total_spent = sum((order.total_amount or 0) for order in orders)
         orders_count = len(orders)
         
         # Simple Logic for Tags and LTV
@@ -340,7 +340,7 @@ def read_admin_user_detail(user_id: int, db: Session = Depends(get_db), admin: s
     
     # Calculate metrics (Same logic - ideally move to service/util)
     orders = db.query(models.Order).filter(models.Order.user_id == user.id).all()
-    total_spent = sum(order.total_amount for order in orders)
+    total_spent = sum((order.total_amount or 0) for order in orders)
     orders_count = len(orders)
     
     tags = []
@@ -373,9 +373,9 @@ def read_admin_user_detail(user_id: int, db: Session = Depends(get_db), admin: s
 def get_inventory_dashboard(db: Session = Depends(get_db), admin: schemas.User = Depends(get_current_admin)):
     products = db.query(models.Product).all()
     
-    total_valuation = sum(p.stock_quantity * p.cost_price for p in products)
-    low_stock_count = sum(1 for p in products if p.stock_quantity <= p.min_stock and p.stock_quantity > 0)
-    out_of_stock_count = sum(1 for p in products if p.stock_quantity == 0)
+    total_valuation = sum((p.stock_quantity or 0) * (p.cost_price or 0) for p in products)
+    low_stock_count = sum(1 for p in products if (p.stock_quantity or 0) <= (p.min_stock or 0) and (p.stock_quantity or 0) > 0)
+    out_of_stock_count = sum(1 for p in products if (p.stock_quantity or 0) == 0)
     
     return {
         "total_valuation": total_valuation,
@@ -456,7 +456,7 @@ def get_analytics_dashboard(db: Session = Depends(get_db), admin: schemas.User =
     ).all()
 
     sales_trend = [
-        schemas.DailySales(date=str(row.date), revenue=row.revenue, orders=row.orders)
+        schemas.DailySales(date=str(row.date), revenue=row.revenue or 0, orders=row.orders)
         for row in sales_trend_data
     ]
     
@@ -471,7 +471,7 @@ def get_analytics_dashboard(db: Session = Depends(get_db), admin: schemas.User =
     ).all()
 
     category_distribution = [
-        schemas.CategorySales(name=row.category, value=row.value)
+        schemas.CategorySales(name=row.category, value=row.value or 0)
         for row in cat_dist_data if row.category
     ]
 

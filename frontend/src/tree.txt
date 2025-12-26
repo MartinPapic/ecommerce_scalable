@@ -1,0 +1,29 @@
+
+Listado de rutas de carpetas para el volumen Windows-SSD
+El número de serie del volumen es DAAC-9150
+C:.
++---app
+¦   +---admin
+¦   ¦   +---inventory
+¦   ¦   ¦   +---[id]
+¦   ¦   +---stats
+¦   ¦   +---users
+¦   ¦       +---[id]
+¦   +---checkout
+¦   +---login
+¦   +---products
+¦   ¦   +---[id]
+¦   +---profile
+¦   +---register
+¦   +---shop
+¦       +---[id]
++---components
+¦   +---cart
+¦   +---home
+¦   +---layout
+¦   +---shop
+¦   +---ui
++---lib
++---models
++---services
++---viewmodels
